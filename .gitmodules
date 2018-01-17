@@ -2,3 +2,7 @@
 	path = neo4j-guides
 	url = https://github.com/neo4j-contrib/neo4j-guides.git
 	branch = master
+[submodule "sandbox-guides"]
+	path = sandbox-guides
+	url = https://github.com/neo4j-contrib/sandbox-guides.git
+	branch = master
