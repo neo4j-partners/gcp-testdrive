@@ -22,9 +22,28 @@ test-drive-public            test-drive-public       533290682560
 
 The way this repo works is that test drive content is stored in `content/*.adoc`.
 
+### Generating Content
+
 `neo4j-guides` is used to generate HTML from that asciidoc, and then the resulting
 content is staged to the Amazon S3 bucket guides.neo4j.com.  The google test drive
 is then set up to autoplay that guide.
+
+### Local Testing Content
+
+Run:
+
+```
+python neo4j-guides/http-server.py
+```
+
+This serves the repo from `http://localhost:8001/`.  In the neo4j instance, ensure that the following
+config is set:
+
+```
+browser.remote_content_hostname_whitelist=*
+```
+
+Then simply run `:play http://localhost:8001/content/index.html`
 
 ## Questions?
 
