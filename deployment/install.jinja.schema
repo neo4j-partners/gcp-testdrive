@@ -1,0 +1,8 @@
+imports:
+- path: install.jinja
+
+
+outputs:
+  url:
+    type: string
+    description: Application URL

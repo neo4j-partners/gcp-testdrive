@@ -1,0 +1,96 @@
+{% set vmName       = env['deployment'] + "-vm" %}
+{% set zone         = "us-central1-a" %}
+{% set machineType  = "n1-standard-1" %}
+{% set imageFamily  = "neo4j-td-image-family" %}
+
+
+{% set waiterName   = env["deployment"] + "-startup-waiter" %}
+{% set configName   = env["deployment"] + "-startup-config" %}
+
+
+resources:
+- name: {{ vmName }}
+  type: compute.v1.instance
+  properties:
+    zone: {{ zone }}
+    machineType: https://www.googleapis.com/compute/v1/projects/{{ \
+    env["project"] }}/zones/{{ zone }}/machineTypes/{{ machineType }}
+    tags:
+      items:
+      - neo4j
+      - http-server
+      - https-server
+    disks:
+    - deviceName: boot
+      type: PERSISTENT
+      boot: true
+      autoDelete: true
+      initializeParams:
+        sourceImage: https://www.googleapis.com/compute/v1/projects/{{ env["project"] \
+        }}/global/images/family/{{ imageFamily }}
+    networkInterfaces:
+    - network: global/networks/default
+      accessConfigs:
+      - name: External NAT
+        type: ONE_TO_ONE_NAT
+    serviceAccounts:
+    - email: default
+      scopes:
+        - https://www.googleapis.com/auth/cloudruntimeconfig
+    metadata:
+      items:
+        - key: my-custom-param
+          value: my-custom-value
+        - key: startup-script
+          value: |
+            #!/bin/bash
+            # Read metadata variables
+            myCustomParam=$(curl -s -H "Metadata-Flavor: Google" \
+            http://metadata.google.internal/computeMetadata/v1/instance/attributes/my-custom-param)
+            externalIp=$(curl -s -H "Metadata-Flavor: Google" \
+            http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip)
+
+
+            # Use your variables according to your needs, e.g.:
+            # echo "${my_custom_param}" >> /var/tmp/deployment-metadata
+            # echo "${externalIp}" >> /var/tmp/deployment-metadata
+            # ...
+
+
+            # Report successful configuration of the instance
+            gcloud beta runtime-config configs variables set success/success \
+            "Startup completed successfully." --config-name {{ configName }}
+
+
+- type: runtimeconfig.v1beta1.config
+  name: {{ configName }}
+  properties:
+    config: {{ configName }}
+
+
+- type: runtimeconfig.v1beta1.waiter
+  name: {{ waiterName }}
+  metadata:
+    dependsOn:
+    - {{ vmName }}
+  properties:
+    parent: $(ref.{{ configName }}.name)
+    waiter: {{ waiterName }}
+    timeout: 600s
+    success:
+      cardinality:
+        path: /success
+        number: 1
+    failure:
+      cardinality:
+        path: /failure
+        number: 1
+
+
+outputs:
+- name: url
+  value: http://$(ref.{{ vmName }}.networkInterfaces[0].accessConfigs[0].natIP):7474/
+- name: username
+  value: neo4j
+- name: password
+  value: testdrive
