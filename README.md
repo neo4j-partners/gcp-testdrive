@@ -45,6 +45,12 @@ browser.remote_content_hostname_whitelist=*
 
 Then simply run `:play http://localhost:8001/content/index.html`
 
+### Content Hosting Destination
+
+`gcloud-testdrive` folder in the `guides.neo4j.com` S3 bucket:
+
+https://s3.console.aws.amazon.com/s3/buckets/guides.neo4j.com/gcloud-testdrive/?region=us-west-2&tab=overview
+
 ## Questions?
 
 Ask David Allen <david.allen@neo4j.com> / moxious on github.
