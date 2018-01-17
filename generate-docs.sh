@@ -1,3 +1,7 @@
 #!/bin/bash
 # Run me to generate the test drive content from ASCIIdoc -> HTML suitable for staging.
-./neo4j-guides/run.sh content/index.adoc content/index.html
+
+for file in content/*.adoc ; do
+   html="${file%.*}".html
+   ./neo4j-guides/run.sh "$file" $html ;
+done
