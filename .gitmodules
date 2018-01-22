@@ -6,3 +6,6 @@
 	path = sandbox-guides
 	url = https://github.com/neo4j-contrib/sandbox-guides.git
 	branch = master
+[submodule "developer-resources"]
+	path = developer-resources
+	url = https://github.com/neo4j-contrib/developer-resources.git
