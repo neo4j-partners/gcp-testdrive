@@ -3,7 +3,7 @@
 :movie_name: 'Matrix'
 :experimental:
 :icon: font
-:img: /content
+:images: https://guides.neo4j.com/gcloud-testdrive/recommendations
 
 
 == Personalized Product Recommendations with Neo4j
@@ -39,7 +39,7 @@ Generating personalized recommendations is one of the most common use cases for 
 
 [subs=attributes]
 ++++
-<img src="{img}/title1.png" class="img-responsive">
+<img src="{images}/title1.png" class="img-responsive">
 ++++
 
 ++++
@@ -56,7 +56,7 @@ Generating personalized recommendations is one of the most common use cases for 
 
 [subs=attributes]
 ++++
-<img src="{img}/openmoviegraph.png" class="img-responsive">
+<img src="{images}/openmoviegraph.png" class="img-responsive">
 ++++
 
 ****
@@ -82,7 +82,7 @@ Data sources:
 //
 //[subs=attributes]
 //++++
-//<img src="{img}/silo1.png" class="img-responsive" height="90%">
+//<img src="{images}/silo1.png" class="img-responsive" height="90%">
 //++++
 //
 //++++
@@ -98,7 +98,7 @@ Data sources:
 //[subs=attributes]
 //.Caption here?
 //++++
-//<img src="{img}/silo2.png" class="img-responsive">
+//<img src="{images}/silo2.png" class="img-responsive">
 //++++
 //
 //++++
@@ -128,7 +128,7 @@ Data sources:
 //.Caption for the image, explain the data model
 //[subs=attributes]
 //++++
-//<img src="{img}/lpg.png" class="img-responsive">
+//<img src="{images}/lpg.png" class="img-responsive">
 //++++
 //
 //++++
@@ -171,7 +171,7 @@ By combining these two in the graph, we are able to query across datasets to gen
 
 [subs=attributes]
 ++++
-<img src="{img}/datamodel.png" class="img-responsive">
+<img src="{images}/datamodel.png" class="img-responsive">
 ++++
 
 ++++
@@ -310,7 +310,7 @@ Recommend items that are similar to those that a user is viewing, rated highly o
 
 [subs=attributes]
 ++++
-<img src="{img}/content1.png" class="img-responsive">
+<img src="{images}/content1.png" class="img-responsive">
 ++++
 
 
@@ -338,7 +338,7 @@ Use the preferences, ratings and actions of other users in the network to find i
 
 [subs=attributes]
 ++++
-<img src="{img}/cf1.png" class="img-responsive">
+<img src="{images}/cf1.png" class="img-responsive">
 ++++
 
 
@@ -367,7 +367,7 @@ The goal of content-based filtering is to find similar items, using attributes (
 
 [subs=attributes]
 ++++
-<img src="{img}/genres.png" class="img-responsive">
+<img src="{images}/genres.png" class="img-responsive">
 ++++
 
 === Similarity Based on Common Genres
@@ -453,7 +453,7 @@ So far we've used the number of common traits as a way to score the relevance of
 
 [subs=attributes]
 ++++
-<img src="{img}/jaccard.png" class="img-responsive">
+<img src="{images}/jaccard.png" class="img-responsive">
 ++++
 
 The Jaccard index is a number between 0 and 1 that indicates how similar two sets are. The Jaccard index of two identical sets is 1. If two sets do not have a common element, then the Jaccard index is 0. The Jaccard is calculated by dividing the size of the intersection of two sets by the union of the two sets.
@@ -517,7 +517,7 @@ RETURN m.title, other.title, s1,s2,((1.0*intersection)/SIZE(union)) AS jaccard O
 
 [subs=attributes]
 ++++
-<img src="{img}/cf2.png" class="img-responsive">
+<img src="{images}/cf2.png" class="img-responsive">
 ++++
 
 Notice that we have user-movie ratings in our graph. The collaborative filtering approach is going to make use of this information to find relevant recommendations.
@@ -631,7 +631,7 @@ Jaccard similarity was useful for comparing movies and is essentially comparing 
 
 [subs=attributes]
 ++++
-<img src="{img}/cosine.png" class="img-responsive">
+<img src="{images}/cosine.png" class="img-responsive">
 ++++
 
 The cosine similarty of two users will tell us how similar two users' preferences for movies are. Users with a high cosine similarity will have similar preferences.
@@ -678,7 +678,7 @@ Pearson similarity, or Pearson correlation, is another similarity metric we can 
 
 [subs=attributes]
 ++++
-<img src="{img}/pearson.png" class="img-responsive">
+<img src="{images}/pearson.png" class="img-responsive">
 ++++
 
 
