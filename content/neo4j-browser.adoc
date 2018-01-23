@@ -23,7 +23,7 @@ Please have link:/download[Neo4j downloaded] and installed. It helps if you read
 
 toc::[]
 
-:img: neo4j-browser/
+:images: https://guides.neo4j.com/gcloud-testdrive/neo4j-browser
 
 == Installing and Starting Neo4j Browser
 
@@ -57,7 +57,7 @@ You can provide your name and send us a message.
 
 Neo4j Browser Sync is a new feature that allows you to synchronize your favorites, styling and settings to a cloud storage, so you can share it across machines and browsers.
 
-image:://s3.amazonaws.com/dev.assets.neo4j.com/wp-content/uploads/neo4j-browser-sync.png[width=500]
+image::https://s3.amazonaws.com/guides.neo4j.com/gcloud-testdrive/neo4j-browser/neo4j-browser-sync.png[width=500]
 
 Just log in with your GitHub, Twitter or Google account and synchronize your workplace to the cloud.
 
@@ -134,9 +134,9 @@ Colors, sizes and captions are selectable from there.
 
 For instance click on the `(Movies)` label above the graph and change the color, size and captions of nodes labeled with `Movie`.
 
-image::{img}style_node.jpg[]
+image::{images}/style_node.jpg[]
 
-image::{img}style_relationship.jpg[]
+image::{images}/style_relationship.jpg[]
 
 == Running Queries
 
@@ -211,7 +211,7 @@ Alternatively by clicking the "fire extinguisher" icon in the popup from `:style
 Within the GRASS file you can change colors, fonts, sizes, outlines and titles per node-label and relationship-type.
 It is also possible to combine multiple properties into a caption with `caption: '{name}, born in {born}';`
 
-image::{img}style_sheet_grass.jpg[]
+image::{images}/style_sheet_grass.jpg[]
 
 
 ////
