@@ -49,10 +49,8 @@ Generating personalized recommendations is one of the most common use cases for 
 ++++
 <div class="col-lg-4 ng-scope">
 ++++
-++++
-<img src="images/click-next.png" style="position:relative;right:-23px;top:-56px;" class="pull-right">
-++++
 
+image::{images}/click-next.png["Next", class="pull-right", position="relative", right="-23px", top="-56px"]
 
 [subs=attributes]
 ++++
@@ -209,86 +207,6 @@ By combining these two in the graph, we are able to query across datasets to gen
 ++++
 </div>
 ++++
-
-
-++++
-</div>
-++++
-
-== Intro To Cypher
-
-In order to work with our labeled property graph, we need a query language for graphs. 
-
-
-++++
-<div class="col-lg-3 ng-scope">
-++++
-=== Graph Patterns
-
-Cypher is the query language for graphs and is centered around *graph patterns*. Graph patterns are expressed in Cypher using ASCII-art like syntax.
-
-*Nodes*
-
-Nodes are defined within parentheses `()`. Optionally, we can specify node label(s): `(:Movie)`
-
-*Relationships*
-
-Relationships are defined within square brackets `[]`. Optionally we can specify type and direction:
-
-`(:Movie)**+<-[:RATED]-+**(:User)`
-
-*Aliases*
-
-Graph elements can be bound to aliases that can be referred to later in the query:
-
-`(**m**:Movie)+<-+[**r**:RATED]-(**u**:User)`
-
-=== Predicates
-
-Filters can be applied to these graph patterns to limit the matching paths. Boolean logic operators, regular expressions and string comparison operators can be used here.
-
-=== Aggregations
-
-There is an implicit group when using aggregation functions such as `COUNT`.
-
-Be sure to use the link:https://neo4j.com/docs/cypher-refcard/current/?ref=browser-guide[Cypher Refcard] as a reference for learning Cypher syntax.
-
-
-++++
-</div>
-++++
-
-++++
-<div class="col-lg-9 ng-scope">
-++++
-
-=== Dissecting a Cypher Statement
-Let's look at a Cypher query that answers the question "How many reviews does each Matrix movie have?". Don't worry if this seems complex, we'll build up our understanding of Cypher as we move along. 
-
-.How many reviews does each Matrix movie have? Click on the block to put the query in the top-most window on the query editor. Hit the triangular icon:play-circle[] button or press kbd:[Ctrl+Enter] to run it and see the resulting visualization.
-
-
-
-[source,cypher]
-----
-MATCH (m:Movie)<-[:RATED]-(u:User)
-WHERE m.title CONTAINS "Matrix"
-WITH m.title AS movie, COUNT(*) AS reviews
-RETURN movie, reviews
-ORDER BY reviews DESC
-LIMIT 5;
-----
-
-[width=100,cols="1,3,2"]
-|===
-| find      | `+MATCH (m:Movie)<-[:RATED]-(u:User)+`         | Search for an existing graph pattern
-| filter    | `WHERE m.title CONTAINS "Matrix"`              | Filter matching paths to only those matching a predicate
-| aggregate | `WITH m.title AS movie, COUNT(*) AS reviews`   | Count number of paths matched for each movie
-| return    | `RETURN movie, reviews`                        | Specify columns to be returned by the statement
-| order     | `ORDER BY reviews DESC`                        | Order by number of reviews, in descending order
-| limit     | `LIMIT 5;`                                     | Only return first four records
-|===
-
 
 
 ++++
