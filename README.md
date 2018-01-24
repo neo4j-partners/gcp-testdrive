@@ -28,6 +28,12 @@ The way this repo works is that test drive content is stored in `content/*.adoc`
 content is staged to the Amazon S3 bucket guides.neo4j.com.  The google test drive
 is then set up to autoplay that guide.
 
+### Deploying Content to the Test Drive
+
+`./deploy-content.sh`
+
+Which basically just copies generated HTML and images to the proper S3 bucket to be referenced by the test drive.  (See content hosting below)
+
 ### Local Testing Content
 
 Run:
