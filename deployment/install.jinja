@@ -9,6 +9,11 @@
 
 
 resources:
+- name: admin-password
+  type: helpers-password.py
+  properties:
+    length: 10
+
 - name: {{ vmName }}
   type: compute.v1.instance
   properties:
@@ -41,15 +46,20 @@ resources:
       items:
         - key: my-custom-param
           value: my-custom-value
+        - key: admin-password
+          value: $(ref.admin-password.password)
         - key: startup-script
           value: |
             #!/bin/bash
             # Read metadata variables
             myCustomParam=$(curl -s -H "Metadata-Flavor: Google" \
             http://metadata.google.internal/computeMetadata/v1/instance/attributes/my-custom-param)
+            
+            adminPassword=$(curl -s -H "Metadata-Flavor: Google" \
+            http://metadata.google.internal/computeMetadata/v1/instance/attributes/admin-password)
+            
             externalIp=$(curl -s -H "Metadata-Flavor: Google" \
             http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip)
-
 
             # Use your variables according to your needs, e.g.:
             # echo "${my_custom_param}" >> /var/tmp/deployment-metadata
