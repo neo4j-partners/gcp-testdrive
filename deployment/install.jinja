@@ -61,10 +61,22 @@ resources:
             externalIp=$(curl -s -H "Metadata-Flavor: Google" \
             http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip)
 
-            # Use your variables according to your needs, e.g.:
-            # echo "${my_custom_param}" >> /var/tmp/deployment-metadata
-            # echo "${externalIp}" >> /var/tmp/deployment-metadata
-            # ...
+            while true; do
+              if curl -s -I http://$externalIp:7474 | grep "200 OK"; then
+                echo "Neo4j is up; changing default password"
+
+                # Change default password.
+                curl -H "Content-Type: application/json" \
+                     -XPOST -d '{"password":"'$adminPassword'"}' \
+                     -u neo4j:testdrive \
+                     http://$externalIp:7474/user/neo4j/password
+                echo "Done"
+                break
+              fi
+
+              echo "Waiting for neo4j to come up"
+              sleep 1
+            done
 
 
             # Report successful configuration of the instance
