@@ -2,8 +2,7 @@ Edit neo4j.conf in /etc/neo4j:
 
 browser.post_connect_cmd=play https://guides.neo4j.com/gcloud-testdrive/index.html
 dbms.connectors.default_listen_address=0.0.0.0
-unsupported.dbms.udc.source=gcloud-orbitera-test-drive
-unsupported.dbms.udc.reg=honest-davids-keys-00001
+dbms.jvm.additional=-Dunsupported.dbms.udc.source=gcloud-testdrive
 
 Guide for browser guides
 https://neo4j.com/developer/guide-create-neo4j-browser-guide/
