@@ -9,17 +9,11 @@
 
 
 resources:
-- name: admin-password
-  type: helpers-password.py
-  properties:
-    length: 10
-
 - name: {{ vmName }}
   type: compute.v1.instance
   properties:
     zone: {{ zone }}
-    machineType: https://www.googleapis.com/compute/v1/projects/{{ \
-    env["project"] }}/zones/{{ zone }}/machineTypes/{{ machineType }}
+    machineType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ zone }}/machineTypes/{{ machineType }}
     tags:
       items:
       - neo4j
@@ -31,8 +25,7 @@ resources:
       boot: true
       autoDelete: true
       initializeParams:
-        sourceImage: https://www.googleapis.com/compute/v1/projects/{{ env["project"] \
-        }}/global/images/family/{{ imageFamily }}
+        sourceImage: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/global/images/family/{{ imageFamily }}
     networkInterfaces:
     - network: global/networks/default
       accessConfigs:
@@ -46,8 +39,6 @@ resources:
       items:
         - key: my-custom-param
           value: my-custom-value
-        - key: admin-password
-          value: $(ref.admin-password.password)
         - key: startup-script
           value: |
             #!/bin/bash
@@ -62,8 +53,12 @@ resources:
             http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip)
 
             while true; do
+              # Loop waiting for neo4j service to start.
               if curl -s -I http://$externalIp:7474 | grep "200 OK"; then
                 echo "Neo4j is up; changing default password"
+
+                # Tmp testing.
+                adminPassword=testdrive
 
                 # Change default password.
                 curl -H "Content-Type: application/json" \
@@ -77,7 +72,6 @@ resources:
               echo "Waiting for neo4j to come up"
               sleep 1
             done
-
 
             # Report successful configuration of the instance
             gcloud beta runtime-config configs variables set success/success \

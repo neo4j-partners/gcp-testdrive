@@ -6,3 +6,9 @@ outputs:
   url:
     type: string
     description: Application URL
+  username:
+    type: string
+    description: username
+  password:
+    type: string
+    description: login password
