@@ -18,6 +18,10 @@ test-drive-development       test-drive-development  751718636122
 test-drive-public            test-drive-public       533290682560
 ```
 
+## Node Configuration
+
+See `neo4j.conf`; this is the configuration that is live in the test-drive image.
+
 ## Content Stuff
 
 The way this repo works is that test drive content is stored in `content/*.adoc`.
