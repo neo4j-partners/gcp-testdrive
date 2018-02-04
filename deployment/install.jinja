@@ -105,7 +105,7 @@ resources:
 
 outputs:
 - name: url
-  value: http://$(ref.{{ vmName }}.networkInterfaces[0].accessConfigs[0].natIP):7474/
+  value: https://$(ref.{{ vmName }}.networkInterfaces[0].accessConfigs[0].natIP):7473/
 - name: username
   value: neo4j
 - name: password
