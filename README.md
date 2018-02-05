@@ -8,6 +8,15 @@ https://cloud.google.com/launcher/docs/partners/test-drive-single-vm
 Files in this repo store the content of the test drive (the browser autoplay
 guide) and notes about how the VM was set up and configured.
 
+## Quick Deploy
+
+```
+gcloud config set project my-project-id
+
+gcloud deployment-manager deployments create my-testdrive \
+    --template deployment/install.jinja
+```
+
 ## Google Stuff
 
 Two GCP projects are relevant for this work:
@@ -25,6 +34,9 @@ See `neo4j.conf`; this is the configuration that is live in the test-drive image
 ## Content Stuff
 
 The way this repo works is that test drive content is stored in `content/*.adoc`.
+
+See git submodules in this repo, a lot of this content was
+borrowed from other places and just molded editorially.
 
 ### Generating Content
 

@@ -1,6 +1,7 @@
 imports:
 - path: install.jinja
-
+- name: password.py
+  path: password.py
 
 outputs:
   url:

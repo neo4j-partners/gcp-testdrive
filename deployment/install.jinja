@@ -9,6 +9,11 @@
 
 
 resources:
+- name: generated-password
+  type: password.py
+  properties:
+    length: 16
+    includeSymbols: false
 - name: {{ vmName }}
   type: compute.v1.instance
   properties:
@@ -42,10 +47,8 @@ resources:
         - key: startup-script
           value: |
             #!/bin/bash
-            # Read metadata variables
-            myCustomParam=$(curl -s -H "Metadata-Flavor: Google" \
-            http://metadata.google.internal/computeMetadata/v1/instance/attributes/my-custom-param)
-            
+            # Leave non-sensitive breadcrumbs in /tmp/vmconfig.txt,
+            # just so if things go wrong we can debug.
             adminPassword=$(curl -s -H "Metadata-Flavor: Google" \
             http://metadata.google.internal/computeMetadata/v1/instance/attributes/admin-password)
             
@@ -55,21 +58,19 @@ resources:
             while true; do
               # Loop waiting for neo4j service to start.
               if curl -s -I http://$externalIp:7474 | grep "200 OK"; then
-                echo "Neo4j is up; changing default password"
-
-                # Tmp testing.
-                adminPassword=testdrive
+                echo "Neo4j is up; changing default password" >> /tmp/vmconfig.txt 2>&1
 
                 # Change default password.
-                curl -H "Content-Type: application/json" \
-                     -XPOST -d '{"password":"'$adminPassword'"}' \
+                curl -v -H "Content-Type: application/json" \
+                     -XPOST -d '{"password":"$(ref.generated-password.password)"}' \
                      -u neo4j:testdrive \
-                     http://$externalIp:7474/user/neo4j/password
-                echo "Done"
+                     http://$externalIp:7474/user/neo4j/password >> /tmp/vmconfig.txt 2>&1
+                
+                echo "Done - we're ready to roll" >> /tmp/vmconfig.txt 2>&1
                 break
               fi
 
-              echo "Waiting for neo4j to come up"
+              echo "Waiting for neo4j to come up..." >> /tmp/vmconfig.txt 2>&1
               sleep 1
             done
 
@@ -109,4 +110,4 @@ outputs:
 - name: username
   value: neo4j
 - name: password
-  value: testdrive
+  value: $(ref.generated-password.password)
