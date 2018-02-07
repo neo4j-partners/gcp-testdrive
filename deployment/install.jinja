@@ -22,8 +22,6 @@ resources:
     tags:
       items:
       - neo4j
-      - http-server
-      - https-server
     disks:
     - deviceName: boot
       type: PERSISTENT
@@ -42,35 +40,32 @@ resources:
         - https://www.googleapis.com/auth/cloudruntimeconfig
     metadata:
       items:
-        - key: my-custom-param
-          value: my-custom-value
+        - key: test-drive-password
+          value: $(ref.generated-password.password)
         - key: startup-script
           value: |
             #!/bin/bash
             # Leave non-sensitive breadcrumbs in /tmp/vmconfig.txt,
-            # just so if things go wrong we can debug.
-            adminPassword=$(curl -s -H "Metadata-Flavor: Google" \
-            http://metadata.google.internal/computeMetadata/v1/instance/attributes/admin-password)
-            
+            # just so if things go wrong we can debug.           
             externalIp=$(curl -s -H "Metadata-Flavor: Google" \
             http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip)
 
             while true; do
               # Loop waiting for neo4j service to start.
               if curl -s -I http://$externalIp:7474 | grep "200 OK"; then
-                echo "Neo4j is up; changing default password" >> /tmp/vmconfig.txt 2>&1
+                echo "Neo4j is up; changing default password" 2>&1 | tee -a /tmp/vmconfig.txt
 
                 # Change default password.
                 curl -v -H "Content-Type: application/json" \
                      -XPOST -d '{"password":"$(ref.generated-password.password)"}' \
                      -u neo4j:testdrive \
-                     http://$externalIp:7474/user/neo4j/password >> /tmp/vmconfig.txt 2>&1
+                     http://$externalIp:7474/user/neo4j/password 2>&1 | tee -a /tmp/vmconfig.txt
                 
-                echo "Done - we're ready to roll" >> /tmp/vmconfig.txt 2>&1
+                echo "Done - we're ready to roll" 2>&1 | tee -a /tmp/vmconfig.txt
                 break
               fi
 
-              echo "Waiting for neo4j to come up..." >> /tmp/vmconfig.txt 2>&1
+              echo "Waiting for neo4j to come up..." 2>&1 | tee -a /tmp/vmconfig.txt
               sleep 1
             done
 
