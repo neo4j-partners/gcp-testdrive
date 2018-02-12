@@ -96,8 +96,9 @@ echo "- zone: ${zone_name}"
 machine_type="f1-micro"
 instance_name="disk-cleaner-$(date +%Y%m%d-%H%M%S)"
 
+gcloud compute disks list --project "${project_name}" --filter="name:(${disk_name}) zone:(${zone_name})" --format "get(name)"
 num_disks_found=$(gcloud compute disks list --project "${project_name}" --filter="name:(${disk_name}) zone:(${zone_name})" --format "get(name)" | wc -l)
-if [[ "${num_disks_found}" != 1 ]]; then
+if [[ -z "${num_disks_found}" ]]; then
   echo "ERROR: disk \"${disk_name}\" could not be found in project"
   echo "       \"${project_name}\" and zone: \"${zone_name}\"."
   exit 1
