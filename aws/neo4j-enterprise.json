@@ -2,6 +2,10 @@
   "variables": {
     "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
     "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
+    "neo4j_version": "3.3.3",
+    "neo4j_edition": "enterprise",
+    "subnet_id": "subnet-e024e499",
+    "security_group_id": "sg-cc0463b3",
     "region": "us-west-2"
   },
   "builders": [
@@ -10,7 +14,9 @@
       "access_key": "{{user `aws_access_key`}}",
       "secret_key": "{{user `aws_secret_key`}}",
       "region": "us-west-2",
-      "subnet_id": "subnet-de5693a7",
+      "subnet_id": "{{user `subnet_id`}}",
+      "security_group_id": "{{user `security_group_id`}}",
+      "associate_public_ip_address": true,
       "source_ami_filter": {
         "filters": {
           "virtualization-type": "hvm",
@@ -24,34 +30,26 @@
       },
       "instance_type": "t2.micro",
       "ssh_username": "ubuntu",
-      "ami_name": "neo4j-enterprise-3.3.3 {{timestamp}}"
+      "ami_name": "neo4j-{{user `neo4j_edition`}}-{{user `neo4j_version`}} {{isotime \"2006-01-02T03_04_05Z\"}}"
     }
   ],
   "provisioners": [
     {
-      "type": "file",
-      "source": "./welcome.txt",
-      "destination": "/home/ubuntu"
-    },
-    {
       "type": "shell",
-      "inline": [
-        "ls -al /home/ubuntu",
-        "cat /home/ubuntu/welcome.txt"
+      "script": "./install-neo4j.sh",
+      "environment_vars": [
+        "neo4j_version={{ user `neo4j_version` }}",
+        "neo4j_edition={{ user `neo4j_edition` }}"
       ]
-    },
-    {
-      "type": "shell",
-      "script": "./example.sh"
-    },
-    {
-      "type": "shell",
-      "script": "./install-neo4j.sh"
     },
     {
       "type": "file",
       "source": "./neo4j.conf",
-      "destination": "/etc/neo4j/"
+      "destination": "/home/ubuntu/neo4j.conf"
+    },
+    {
+      "type": "shell",
+      "script": "./neo4j-postinstall.sh"
     }
   ]
 }

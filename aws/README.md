@@ -6,17 +6,20 @@ Test drive in Amazon land is called "Quick Start".
 
 ## Dependencies
 
-```
-brew install packer
-```
+* `brew install packer`
+* Install AWS CLI and authenticate
 
 ## Build Neo4j Enterprise AMI
 
-This will take whatever is the latest stable.
+You should specify edition (community/enterprise) and version.
+
+Optionally, you can omit the AWS key variables and set them in your environment.
 
 ```
-packer build neo4j-enterprise.json
+packer build \
+    -var "neo4j_edition=enterprise" \
+    -var "neo4j_version=3.3.3" \
+    neo4j-enterprise.json
 ```
 
-If you're upgrading, note you should change `ami_name` in that JSON file, so the AMI is clear on what it is.
-
+Check the variables at the top of the JSON file for other options you can override/set.
