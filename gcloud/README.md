@@ -25,6 +25,29 @@ test-drive-development       test-drive-development  751718636122
 test-drive-public            test-drive-public       533290682560
 ```
 
+## How the Test Drive gets Launched
+
+On the [Orbitera Test Drive Admin screen](https://neo4j.orbitera.com/c2m/testDrives), by editing the test
+drive there's an item labeled "credentials".  These are the JSON credentials of a service account.
+
+It's not obvious, but which project the test drives get launched into is a function of what service account
+is provided.  The key used for deploys is the Orbitera test drive SA account in `test-drive-public`.
+
+This in turn requires that whatever test drive development image you're using, has to be copied to the test-drive-public
+project.  This encapsulates all running test drives to one place, which can be managed separately, and means that you
+can do development in test-drive-development without accidentally breaking any live test drives.
+
+Here's how to copy a development image over to production:
+
+```
+export IMAGE=test-drive-v2-neo4j-3-3-3
+gcloud compute --project=test-drive-public images create $IMAGE \
+   --source-image=$IMAGE --family neo4j-test-drive \
+   --source-image-project=test-drive-development
+```
+
+The test drive picks up whatever the latest image is in this image family, so tagging to a family is critical.
+
 ## Orbitera / Marketo Integration
 
 [Relevant docs here](https://www.orbitera.com/marketo-joins-orbitera-callback-club/).
