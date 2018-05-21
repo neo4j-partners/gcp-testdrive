@@ -9,7 +9,7 @@ guide) and notes about how the VM was set up and configured.
 ## Quick Deploy
 
 ```
-gcloud config set project my-project-id
+gcloud config set project test-drive-development
 
 gcloud deployment-manager deployments create my-testdrive \
     --template deployment/install.jinja
@@ -40,7 +40,7 @@ can do development in test-drive-development without accidentally breaking any l
 Here's how to copy a development image over to production:
 
 ```
-export IMAGE=test-drive-v2-neo4j-3-3-3
+export IMAGE=test-drive-v3-neo4j-3-4-0
 gcloud compute --project=test-drive-public images create $IMAGE \
    --source-image=$IMAGE --family neo4j-test-drive \
    --source-image-project=test-drive-development
@@ -70,19 +70,21 @@ Magic values (check instructions above to understand how they fit in)
 
 - Launch a regular test drive.
 - `gcloud compute ssh` into that VM, do whatever needs to be done.
+- Make whatever changes you need.  E.g. `apt-get upgrade` to catch a new neo4j release.
+- Ensure that the test data is still there, do not empty the db contents.
 - Make sure to change neo4j user password back to "testdrive" because VM setup
 script expects this.  Setting initial secure password won't work if underlying VM
 already has one.
 - Stop the VM
-- Delete the VM but keep its underlying disks: `gcloud compute instances delete td-sample-vm --keep-disks=all`
-- Use the provided google disk cleanup script to prepare the disk: `./cleanup-disk.sh  --disk my-testdrive-vm --project test-drive-development --zone us-central1-a`.  Be aware this script has been buggy, the version you're provided with includes some of my manual modifications to make it work. Depending on how much time elapses, you may want to download a fresh copy from `https://storage.googleapis.com/partner-utils/disk-cleanup/cleanup-disk.zip`.
+- Delete the VM but keep its underlying disks: `gcloud compute instances delete my-testdrive-vm --keep-disks=all`
+- Use the provided google disk cleanup script to prepare the disk: `cd  google-disk-cleanup && ./cleanup-disk.sh  --disk my-testdrive-vm --project test-drive-development --zone us-central1-a`.  Be aware this script has been buggy, the version you're provided with includes some of my manual modifications to make it work. Depending on how much time elapses, you may want to download a fresh copy from `https://storage.googleapis.com/partner-utils/disk-cleanup/cleanup-disk.zip`.
 - (Disk cleanup takes ~10 minutes to complete)
 - Create a fresh image from the cleaned up disk.  Note the image family here, this is critical
 
 ```
 gcloud compute images create test-drive-vX-neo4j-vWhatever \
-  --source-disk td-sample-cleaned-up-disk \
-  --source-disk-zone whatever-zone \
+  --source-disk my-testdrive-vm \
+  --source-disk-zone us-central1-a \
   --family neo4j-test-drive
 ```
 
