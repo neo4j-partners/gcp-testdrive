@@ -90,7 +90,8 @@ neo4j-test-drive are older versions with different setups.
 gcloud compute images create test-drive-v7-neo4j-3-5-3 \
   --source-disk prep \
   --source-disk-zone us-east1-b \
-  --family neo4j-test-drive2
+  --family neo4j-test-drive2 \
+  --project test-drive-public
 ```
 
 **Make sure to keep the image family consistent**.  This is because Orbitera will pick up the latest image in the given image family. If the image family isn't set, your new image won't affect Oribitera in any way, and you'll end up re-doing this or modifying the deployment template.  
