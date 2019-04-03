@@ -16,12 +16,6 @@ resources:
     length: 16
     includeSymbols: false
 
-#- name: hostname
-#  type: runtimeconfig.v1beta1.config
-#  properties:
-#    config: hostname
-#    description: VM hostname
-
 - name: {{ vmName }}
   type: compute.v1.instance
   properties:
@@ -136,8 +130,6 @@ resources:
 # Given an IP address of X.Y.Z.A, the hostname will end up being:
 # X-Y-Z-A.gcp-neo4j-sandbox.com
 outputs:
-#- name: url
-#  value: https://$(ref.{{ vmName }}.networkInterfaces[0].accessConfigs[0].natIP):7473/
 - name: url
   value: https://$(ref.hostname.text):7473/
 - name: username
