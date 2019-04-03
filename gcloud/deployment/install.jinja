@@ -50,16 +50,22 @@ resources:
             #!/bin/bash
             # Leave non-sensitive breadcrumbs in /tmp/vmconfig.txt,
             # just so if things go wrong we can debug.
-            hostname=$(curl -X POST -H 'X-Api-Key: CfaZwE3RGk28F6jhoPQYW7sV1FZ0uFiI4BWF2Ik4' 'https://ydfsrlbp9i.execute-api.us-east-1.amazonaws.com/prod')
+            externalIp=$(curl -s -H "Metadata-Flavor: Google" \
+            http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip)
+
+            hostname=$(curl -f -X POST -H 'X-Api-Key: CfaZwE3RGk28F6jhoPQYW7sV1FZ0uFiI4BWF2Ik4' 'https://ydfsrlbp9i.execute-api.us-east-1.amazonaws.com/prod')
+
+            if [ $? -ne 0 ] ; then
+               echo "Failed to get DNS name from Ryan's stuff, falling back to IP" | tee -a /tmp/vmconfig.txt
+               hostname=$externalIp
+            fi
+
             sudo systemctl stop neo4j
             echo "Hostname is $hostname" | tee -a /tmp/vmconfig.txt
 
             # Update config with hostname taken from Ryan's stuff.
             cat /etc/neo4j/neo4j.orig | sudo sed 's|dbms.connectors.default_advertised_address=.*|dbms.connectors.default_advertised_address='${hostname}'|' > /etc/neo4j/neo4j.conf
             sudo systemctl start neo4j
-
-            externalIp=$(curl -s -H "Metadata-Flavor: Google" \
-            http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip)
 
             while true; do
               # Loop waiting for neo4j service to start.
