@@ -40,7 +40,7 @@ can do development in test-drive-development without accidentally breaking any l
 Here's how to copy a development image over to production:
 
 ```
-export IMAGE=test-drive-v3-neo4j-3-4-0
+export IMAGE=test-drive-v4-neo4j-3-4-9
 gcloud compute --project=test-drive-public images create $IMAGE \
    --source-image=$IMAGE --family neo4j-test-drive \
    --source-image-project=test-drive-development
@@ -76,16 +76,22 @@ Magic values (check instructions above to understand how they fit in)
 script expects this.  Setting initial secure password won't work if underlying VM
 already has one.
 - Stop the VM
-- Delete the VM but keep its underlying disks: `gcloud compute instances delete my-testdrive-vm --keep-disks=all`
-- Use the provided google disk cleanup script to prepare the disk: `cd  google-disk-cleanup && ./cleanup-disk.sh  --disk my-testdrive-vm --project test-drive-development --zone us-central1-a`.  Be aware this script has been buggy, the version you're provided with includes some of my manual modifications to make it work. Depending on how much time elapses, you may want to download a fresh copy from `https://storage.googleapis.com/partner-utils/disk-cleanup/cleanup-disk.zip`.
+- Delete the VM but keep its underlying disks: `gcloud compute instances delete prep --keep-disks=all --project test-drive-public`
+- Use the provided google disk cleanup script to prepare the disk: `cd  google-disk-cleanup && ./cleanup-disk.sh  --disk prep --project test-drive-public --zone us-east1-b`.  Be aware this script has been buggy, the version you're provided with includes some of my manual modifications to make it work. Depending on how much time elapses, you may want to download a fresh copy from `https://storage.googleapis.com/partner-utils/disk-cleanup/cleanup-disk.zip`.
 - (Disk cleanup takes ~10 minutes to complete)
 - Create a fresh image from the cleaned up disk.  Note the image family here, this is critical
 
+In the install.jinja file, you select the latest VM by family.  As of the DBaaS launch with
+Google at NEXT '19, moved to image family neo4j-test-drive2 because we added significant new
+stuff around DNS and other features in the test drive.   Images with a family prior to 
+neo4j-test-drive are older versions with different setups.
+
 ```
-gcloud compute images create test-drive-vX-neo4j-vWhatever \
-  --source-disk my-testdrive-vm \
-  --source-disk-zone us-central1-a \
-  --family neo4j-test-drive
+gcloud compute images create test-drive-v7-neo4j-3-5-3 \
+  --source-disk prep \
+  --source-disk-zone us-east1-b \
+  --family neo4j-test-drive2 \
+  --project test-drive-public
 ```
 
 **Make sure to keep the image family consistent**.  This is because Orbitera will pick up the latest image in the given image family. If the image family isn't set, your new image won't affect Oribitera in any way, and you'll end up re-doing this or modifying the deployment template.  

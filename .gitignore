@@ -1,3 +1,4 @@
 # Ignore generated HTML, only track asciidoc
 content/*.html
 .DS_Store
+orbitera-testdrive-package.zip

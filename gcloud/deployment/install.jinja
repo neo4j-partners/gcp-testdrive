@@ -1,12 +1,13 @@
 {% set vmName       = env['deployment'] + "-vm" %}
 {% set zone         = "us-central1-a" %}
 {% set machineType  = "n1-standard-1" %}
-{% set imageFamily  = "neo4j-test-drive" %}
 
+# As of Google NEXT announcement, we use neo4j-test-drive2 family,
+# which includes DNS/SSL configuration and other version updates.
+{% set imageFamily  = "neo4j-test-drive2" %}
 
 {% set waiterName   = env["deployment"] + "-startup-waiter" %}
 {% set configName   = env["deployment"] + "-startup-config" %}
-
 
 resources:
 - name: generated-password
@@ -14,6 +15,7 @@ resources:
   properties:
     length: 16
     includeSymbols: false
+
 - name: {{ vmName }}
   type: compute.v1.instance
   properties:
@@ -38,6 +40,7 @@ resources:
     - email: default
       scopes:
         - https://www.googleapis.com/auth/cloudruntimeconfig
+        - https://www.googleapis.com/auth/logging.write
     metadata:
       items:
         - key: test-drive-password
@@ -46,9 +49,23 @@ resources:
           value: |
             #!/bin/bash
             # Leave non-sensitive breadcrumbs in /tmp/vmconfig.txt,
-            # just so if things go wrong we can debug.           
+            # just so if things go wrong we can debug.
             externalIp=$(curl -s -H "Metadata-Flavor: Google" \
             http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip)
+
+            hostname=$(curl -f -X POST -H 'X-Api-Key: CfaZwE3RGk28F6jhoPQYW7sV1FZ0uFiI4BWF2Ik4' 'https://ydfsrlbp9i.execute-api.us-east-1.amazonaws.com/prod')
+
+            if [ $? -ne 0 ] ; then
+               echo "Failed to get DNS name from Ryan's stuff, falling back to IP" | tee -a /tmp/vmconfig.txt
+               hostname=$externalIp
+            fi
+
+            sudo systemctl stop neo4j
+            echo "Hostname is $hostname" | tee -a /tmp/vmconfig.txt
+
+            # Update config with hostname taken from Ryan's stuff.
+            cat /etc/neo4j/neo4j.orig | sudo sed 's|dbms.connectors.default_advertised_address=.*|dbms.connectors.default_advertised_address='${hostname}'|' > /etc/neo4j/neo4j.conf
+            sudo systemctl start neo4j
 
             while true; do
               # Loop waiting for neo4j service to start.
@@ -69,16 +86,21 @@ resources:
               sleep 1
             done
 
-            # Report successful configuration of the instance
-            gcloud beta runtime-config configs variables set success/success \
-            "Startup completed successfully." --config-name {{ configName }}
+            gcloud config get-value account 2>&1 | tee -a /tmp/vmconfig.txt
 
+            # Signal back to deployment manager template the hostname of this VM.
+            gcloud beta runtime-config configs variables set hostname "$hostname" \
+            --config-name {{ configName }} --is-text 2>&1 | tee -a /tmp/vmconfig.txt
+
+            # Report successful configuration of the instance so the deployment terminates
+            gcloud beta runtime-config configs variables set success/success \
+            "$hostname" --config-name {{ configName }} 2>&1 | tee -a /tmp/vmconfig.txt
+            echo "Finished configuration process" | tee -a /tmp/vmconfig.txt
 
 - type: runtimeconfig.v1beta1.config
   name: {{ configName }}
   properties:
     config: {{ configName }}
-
 
 - type: runtimeconfig.v1beta1.waiter
   name: {{ waiterName }}
@@ -98,10 +120,24 @@ resources:
         path: /failure
         number: 1
 
+# This stores the hostname reported back by VM startup script.
+# Note that it must depend on the waiter.
+- name: hostname
+  type: runtimeconfig.v1beta1.variable
+  properties:
+    parent: $(ref.{{ configName }}.name)
+    variable: hostname
+  metadata:
+    dependsOn:
+    - {{ waiterName }}
 
+# Note on machine hostname!  After the VM is set up, you can access IP by
+# $(ref.{{ vmName }}.networkInterfaces[0].accessConfigs[0].natIP)
+# Given an IP address of X.Y.Z.A, the hostname will end up being:
+# X-Y-Z-A.gcp-neo4j-sandbox.com
 outputs:
 - name: url
-  value: https://$(ref.{{ vmName }}.networkInterfaces[0].accessConfigs[0].natIP):7473/
+  value: https://$(ref.hostname.text):7473/
 - name: username
   value: neo4j
 - name: password
