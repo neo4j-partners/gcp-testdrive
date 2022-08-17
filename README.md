@@ -1,3 +1,6 @@
+# Important Note
+This repo has been deprecated.  Neo4j is no longer maintaing a Test Drive on GCP.  This may be replaced with a Qwiklab at some point.
+
 # gcloud-testdrive
 
 Files related to GCP test-drive for neo4j-enterprise
